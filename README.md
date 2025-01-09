@@ -1,11 +1,11 @@
-# Stewardly
+# Tracker
 
 # Getting Started
 
 First clone the repository from GitLab and switch to the new directory:
 
-    $ git clone https://gitlab.com/stewardly/stewardly.git
-    $ cd stewardly/backend/stewardly
+    $ git clone https://github.com/mzeeshantech/Tracker.git/
+    $ cd Tracker
     
 # Requirements  
 
