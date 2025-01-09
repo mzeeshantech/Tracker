@@ -1,0 +1,64 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Template</title>
+
+    <!-- Link to your custom CSS file in static/myapp/css/ -->
+    <link href="{% static 'Breaker/css/style.css' %}" rel="stylesheet">
+
+    <!-- Bootstrap CSS (via CDN) -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="header">
+        <div style="" class="header-logo">
+            <i class="bi bi-three-dots" style="font-size: 24px;"></i>
+            <span style="margin-left: 22px; margin-right: 4px"><strong>OnTrack</strong></span>Solution
+        </div>
+    </div>
+    <div class="main-content row-flex">
+        <div class="side-bar">
+            <div style="width: 200px; height: 50px; padding: 10px;
+            align-items: center;
+            margin-top: 30px; background-color: #007EF2" class="item row-flex">
+                <i class="bi bi-three-dots white-color" style="font-size: 24px;margin-left: 20px;"></i>
+                <div style="margin-left: 8px" class="white-color">
+                    Dashboard
+                </div>
+            </div>
+
+
+        </div>
+        <div style="background-color: #F9F9F9;" class="main-body"></div>
+
+    </div>
+
+</div>
+
+
+<div class="container" style="display: none">
+    <h1 class="mt-5">{{ title }}</h1>
+    <p>{{ description }}</p>
+
+    <!-- Dynamic data rendering -->
+    <ul class="list-group">
+        {% for item in items %}
+            <li class="list-group-item">{{ item }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Bootstrap JS (via CDN) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+</body>
+</html>
