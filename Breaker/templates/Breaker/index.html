@@ -5,60 +5,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bootstrap Template</title>
+    <title>Breaker Statistics</title>
 
-    <!-- Link to your custom CSS file in static/myapp/css/ -->
+    <!-- Bootstrap CSS (v5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons (latest version for Bootstrap 5) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Link to your custom CSS file -->
     <link href="{% static 'Breaker/css/style.css' %}" rel="stylesheet">
 
-    <!-- Bootstrap CSS (via CDN) -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
 
-<div class="wrapper">
-    <div class="header">
-        <div style="" class="header-logo">
-            <i class="bi bi-three-dots" style="font-size: 24px;"></i>
-            <span style="margin-left: 22px; margin-right: 4px"><strong>OnTrack</strong></span>Solution
-        </div>
-    </div>
-    <div class="main-content row-flex">
-        <div class="side-bar">
-            <div style="width: 200px; height: 50px; padding: 10px;
-            align-items: center;
-            margin-top: 30px; background-color: #007EF2" class="item row-flex">
-                <i class="bi bi-three-dots white-color" style="font-size: 24px;margin-left: 20px;"></i>
-                <div style="margin-left: 8px" class="white-color">
-                    Dashboard
-                </div>
-            </div>
-
-
-        </div>
-        <div style="background-color: #F9F9F9;" class="main-body"></div>
-
-    </div>
-
+<div class="header d-flex align-items-center p-3 bg-white border-bottom shadow-sm">
+    <i class="bi bi-speedometer2 text-primary" style="font-size: 28px;"></i>
+    <span class="ml-5 font-weight-bold h4 text-dark mb-0" style="margin-left: 1rem;">OnTrack Solution</span>
 </div>
 
 
-<div class="container" style="display: none">
-    <h1 class="mt-5">{{ title }}</h1>
-    <p>{{ description }}</p>
+<div class="d-flex">
+    <!-- Sidebar -->
+    <div class="side-bar bg-primary text-white p-3" style="width: 250px; height: 100vh;">
+        <div class="d-flex align-items-center p-2 bg-white text-primary rounded">
+            <i class="bi bi-grid-fill mr-3" style="font-size: 24px;"></i>
+            <span style="margin-left: 1rem;">Dashboard</span>
+        </div>
+    </div>
 
-    <!-- Dynamic data rendering -->
-    <ul class="list-group">
-        {% for item in items %}
-            <li class="list-group-item">{{ item }}</li>
-        {% endfor %}
-    </ul>
+    <!-- Main Content -->
+    <div class="main-body flex-grow-1 bg-light p-4">
+
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 font-weight-bold">Breaker Statistics</h1>
+            <div class="d-flex gap-2">
+                <button id="toggleFilterBtn" type="button" class="btn btn-primary btn-md" style="display: none;">Filter</button>
+                <button class="btn btn-primary">Export as PDF</button>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div id="filterSection" class="bg-white p-4 rounded shadow-sm mb-4" >
+            <form class="row g-3" id="locationForm" method="GET" action="/fetch-data/">
+                <div class="col-md-3">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" id="startDate" class="form-control" value="2024-01-01">
+                </div>
+                <div class="col-md-3">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" id="endDate" class="form-control" value="2024-11-25">
+                </div>
+                <div class="col-md-3">
+                    <label for="location" class="form-label">Location</label>
+                        <select name="location" id="location" class="form-select"
+                                onchange="document.getElementById('locationForm').submit();">
+                            <option value="" selected>All</option>
+                            {% for location in locations %}
+                                <option value="{{ location }}" {% if selected_location == location %}selected{% endif %}>{{ location }}</option>
+                            {% endfor %}
+                        </select>
+
+
+                </div>
+                <div class="col-md-3">
+                    <label for="breaker" class="form-label">Breaker</label>
+                    <select id="breaker" class="form-select">
+                        <option>All</option>
+                        <option>JRC 51</option>
+                        <option>JRC 52</option>
+                        <option>JRC 53</option>
+                    </select>
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">Apply</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Section -->
+        <div class="bg-white p-4 rounded shadow-sm">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th></th> <!-- Empty column for the expand/collapse icon -->
+                    <th>Breaker</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Open By CMD</th>
+                    <th>Closed By CMD</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for breaker in breaker_data %}
+                    <!-- Main Row -->
+                    {% if breaker.operation == "Summary" %}
+                        <tr data-bs-toggle="collapse" data-bs-target="#detailsRow{{ breaker.breaker_id }}"
+                            class="clickable">
+                            <td>
+                                <i class="bi bi-plus-circle text-primary toggle-icon"></i>
+                            </td>
+                            <td colspan="1">{{ breaker.breaker_id }}</td>
+                            <td colspan="1"></td>
+                            <td colspan="1"></td>
+                            <td colspan="1"></td>
+                            <td colspan="1"></td>
+                            <td colspan="1" class="text-right font-weight-bold">
+                                Total Trips:
+                                <strong>
+                                    {{ breaker.total_trips }}
+                                </strong>
+                                | Duration:
+                                <strong>
+                                    {% if breaker.duration %}
+                                        {{ breaker.duration }} minutes
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </strong>
+                            </td>
+                        </tr>
+                    {% endif %}
+
+                    {% if breaker.operation == "Trip" %}
+                        <tr id="detailsRow{{ breaker.breaker_id }}" class="collapse child-row">
+                            <td></td>
+                            <td>{{ breaker.breaker_id }}</td>
+                            <td>{{ breaker.start_time }}</td>
+                            <td>{{ breaker.end_time }}</td>
+                            <td>{{ breaker.duration }} minutes</td>
+
+
+                            {% if breaker.open_by_cmd %}
+                                <td><i class="bi bi-check text-success"></i></td>
+                            {% else %}
+                                <td><i class="bi bi-x text-danger"></i></td>
+                            {% endif %}
+
+                            {% if breaker.close_by_cmd %}
+                                <td><i class="bi bi-check text-success"></i></td>
+                            {% else %}
+                                <td><i class="bi bi-x text-danger"></i></td>
+                            {% endif %}
+
+                        </tr>
+                    {% endif %}
+
+                    <!-- Child Rows -->
+                    {#                    {% for trip in breaker_data %}#}
+                    {#                        #}
+                    {#                    {% endfor %}#}
+
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                </tfoot>
+            </table>
+
+            <!-- Pagination -->
+            <nav>
+                <ul class="pagination justify-content-end">
+                    <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">...</a></li>
+                    <li class="page-item"><a class="page-link" href="#">10</a></li>
+                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                </ul>
+            </nav>
+        </div>
+
+
+    </div>
+</div>
 </div>
 
 <!-- Bootstrap JS (via CDN) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
+<script src="{% static 'Breaker/script/breaker.js' %}"></script>
 </body>
 </html>

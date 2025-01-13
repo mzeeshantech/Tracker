@@ -6,9 +6,8 @@ html, body {
 .wrapper {
     display: flex;
     flex-direction: column;
-    height: 100vh;  /* Full screen height */
+    height: 100vh; /* Full screen height */
 }
-
 
 
 .header {
@@ -30,6 +29,7 @@ html, body {
     display: flex;
     flex-direction: row;
 }
+
 .white-color {
     color: white;
 }
@@ -38,27 +38,38 @@ html, body {
     width: 100%;
     height: 100%;
 
-    .side-bar {
-        width: 256px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+.side-bar {
+    width: 256px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-        .item {
-            border-radius: 200px
-        }
-    }
-    .main-body {
-        width: 100%;
-        height: 100%;
-    }
+.item {
+    border-radius: 200px
+}
+
+}
+.main-body {
+    width: 100%;
+    height: 100%;
+}
+
 }
 
 
-
-
-.container
-{
+.container {
     background-color: antiquewhite;
+}
+
+.child-row {
+    background-color: #e6f7ff !important; /* Light blue background */
+}
+
+.child-row:hover td {
+    background-color: #d0efff !important; /* Slightly darker blue on hover */
+}
+
+.child-row td {
+    background-color: #e6f7ff !important; /* Ensure all cells in child rows have the light blue background */
 }
