@@ -1,13 +1,21 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
+from django.core import paginator
 from django.utils.timezone import localtime, now, make_aware
 from django.shortcuts import render
 from django.db import connection
 import pandas as pd
+from django.http import JsonResponse
 from django.utils.timezone import is_aware
 
 from Tracker import settings
 from django.utils.timezone import now
+from django.core.paginator import Paginator
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import tempfile
 
 
 def convert_minutes_to_dhms(minutes):
@@ -80,7 +88,27 @@ def dummy_data():
     return df
 
 
-def testing(df):
+
+def get_paginated_data(request, df):
+    page_size = 2  # Number of items per page
+    page = int(request.GET.get('page', 1))  # Get the page number from request
+    start = (page - 1) * page_size
+    end = page * page_size
+
+    # Slice the DataFrame for pagination
+    paginated_df = df.iloc[start:end]
+
+    # Optional: calculate total pages
+    total_pages = (len(df) + page_size - 1) // page_size  # Ceiling division
+
+    # JsonResponse
+    return ({
+        'data': paginated_df,
+        'page': page,
+        'total_pages': total_pages
+    })
+
+def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagination = False, request = None):
     # Extract the breaker ID as the third word in the TEXT column
     df["Breaker_ID"] = df["TEXT"].str.split().str[2]
 
@@ -93,17 +121,13 @@ def testing(df):
 
     # Find durations between OPEN and CLOSED for each breaker
     for breaker_id, group in grouped:
-        group = group.sort_values("ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')")
+        group = group.sort_values("ZX")
         trips = []
         open_time = None
         open_by_cmd = False
         close_by_cmd = False
         breaker_trips_total_time = 0
         for i, row in group.iterrows():
-            # print(i)
-            # print(row)
-            # print(group.iloc[1])
-            # exit()
 
             if "OPEN" in row["TEXT"]:
                 if "OPEN BY" in row["TEXT"]:
@@ -111,9 +135,9 @@ def testing(df):
                 if "CTRL ISSUED BY" in row["TEXT"]:
                     open_by_cmd = True
 
-                open_time = row["ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')"]
+                open_time = row["ZX"]
             elif ("CLOSED" in row["TEXT"] or "CLOSE CTRL" in row["TEXT"]) and open_time is not None:
-                closed_time = row["ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')"]
+                closed_time = row["ZX"]
                 if "CLOSED BY" in row["TEXT"]:
                     continue
 
@@ -151,63 +175,68 @@ def testing(df):
     # Flatten data for display
     flat_data = []
     for summary in breakers_summary:
-        flat_data.append({
-            "breaker_id": summary["breaker_id"],
-            "total_trips": summary["total_trips"],
-            "start_time": None,
-            "end_time": None,
-            "duration": summary["total_trips_time"],
-            "operation": "Summary"
-        })
-        for trip in summary["child_rows"]:
+        if only_parent_rows:
             flat_data.append({
                 "breaker_id": summary["breaker_id"],
-                "total_trips": None,
-                **trip
+                "total_trips": summary["total_trips"],
+                "start_time": None,
+                "end_time": None,
+                "duration": summary["total_trips_time"],
+                "operation": "Summary"
             })
+        if only_child_rows:
+            for trip in summary["child_rows"]:
+                flat_data.append({
+                    "breaker_id": summary["breaker_id"],
+                    "total_trips": None,
+                    **trip
+                })
 
     result_df = pd.DataFrame(flat_data)
     # print(result_df)
     return result_df
 
 
-def query_data(location=None, from_date='2024-01-01 00:00:00'):
-    # SQL query
-    sql_query = """
-    SELECT 
-        id,
-        TO_CHAR("time", 'DD/MM/YYYY HH24:MI:SS') AS "ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')",
-        "ms" AS "MS",
-        "text" AS "TEXT"
-    FROM 
-        "alarm"
-    WHERE 
-        "time" >= TO_TIMESTAMP('2024-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
-        AND "time" <= TO_TIMESTAMP('2024-11-25 23:59:59', 'YYYY-MM-DD HH24:MI:SS')
-        AND "text" ILIKE '%BREAKER%'
-        AND (
-            "text" ILIKE '%OPEN%'
-            OR "text" ILIKE '%CLOSE%'
-        )
-        AND "text" ILIKE '%CB%'
-    """
+def query_data(location=None, from_date=None, end_date=None, breaker_id=None):
 
-    # Add location filter if a location is selected
-    if location:
-        sql_query += " AND \"location\" = '{}'".format(location)
-        params = [location]  # Use parameterized query to avoid SQL injection
-    else:
-        params = []  # No parameters needed if no location filter
+    print(f"location = {location}")
+    from_date = from_date.strftime("%d/%m/%Y")
 
-    # Add ORDER BY clause
-    sql_query += """
-        ORDER BY 
-            SUBSTRING("text" FROM 1 FOR POSITION('BREAKER' IN "text") - 1), 
-            "time"
-        """
-    # Execute the raw query
+    end_date = end_date.strftime("%d/%m/%Y")
+    query_condition = ""
+    if location != 'all' and location is not None:
+        query_condition = f''' AND "A1"."LOCATION" = '{location}' '''
+
+    if breaker_id != 'all' and breaker_id is not None:
+        query_condition = f''' AND "A1"."TEXT" LIKE '%{breaker_id}%' '''
+
+    query = f"""
+            SELECT
+                "A1"."TIME" as zx,
+                "A1"."MS" AS "MS",
+                "A1"."TEXT" AS "TEXT"
+            FROM
+                "ALARM" "A1"
+            WHERE
+                "A1"."TIME" >= TO_DATE('{from_date}', 'dd/mm/yyyy hh24:mi:ss')
+                AND "A1"."TIME" <= TO_DATE('{end_date}', 'dd/mm/yyyy hh24:mi:ss')
+                AND "A1"."TEXT" LIKE '%BREAKER%'
+                AND (
+                    "A1"."TEXT" LIKE '%OPEN%'
+                    OR "A1"."TEXT" LIKE '%CLOSE%'
+                )
+                AND "A1"."TEXT" LIKE UPPER('%CB%')
+                {query_condition}
+            ORDER BY
+                SUBSTR("A1"."TEXT", 1, INSTR("A1"."TEXT", 'BREAKER') - 2),
+                "A1"."TIME"
+            """
+
+    print(f"query = {query}")
+
+    # Execute the query
     with connection.cursor() as cursor:
-        cursor.execute(sql_query)
+        cursor.execute(query)
         rows = cursor.fetchall()  # Fetch all rows from the executed query
         columns = [col[0] for col in cursor.description]
 
@@ -222,36 +251,198 @@ def get_all_locations():
 
     return locations
 
+def get_all_breakers():
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT DISTINCT REGEXP_SUBSTR(TEXT, '[^ ]+', 1, 3) AS extracted_value FROM ALARM WHERE TEXT IS NOT NULL ")
+        breakers = [row[0] for row in cursor.fetchall()]  # Extract the first column (location)
 
-def fetch_data(request):
-    location = request.GET.get('location', None)
-    df = query_data(location=location)
-    # df = dummy_data()
-    result = testing(df)
-    # results = result.to_json(orient='records')
-    results = result.to_dict(orient='records')
+    return breakers
 
-    context = {
-        'breaker_data': results,
-        'locations': get_all_locations(),
-        'selected_location': location
-    }
-
-    return render(request, 'Breaker/index.html', context)
 
 
 def index(request):
+    input_template_name = "hud"
+    input_json_file = "hud"
+
+    # template_file = f"./input_htmls/{input_template_name}.html"
+    # json_file = f"./input_jsons/{input_json_file}.json"
+    # output_html_file = f"./generated_htmls/{input_template_name}_new_html.html"  # Output HTML file (optional)
+    # output_pdf_file = f"./generated_pdfs/{input_template_name}_output.pdf"  # Path to the output PDF file
+
     location = request.GET.get('location', None)
-    df = query_data()
-    # df = dummy_data()
-    result = testing(df)
-    # results = result.to_json(orient='records')
-    results = result.to_dict(orient='records')
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    breaker = request.GET.get('breaker', None)
+
+    print(breaker)
+
+
+    if start_date is None and end_date is None:
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
+    else:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    df          = query_data(location, start_date, end_date,breaker_id=breaker)
+    result      = data_processing(df, only_child_rows=False, do_pagination=True)
+
+    pagniation_data      = get_paginated_data(request, result)
+
+    result = pagniation_data["data"]
+
+
+    results     = result.to_dict(orient='records')
+    start_date = start_date.strftime("%Y-%m-%d")
+    end_date = end_date.strftime("%Y-%m-%d")
 
     context = {
         'breaker_data': results,
         'locations': get_all_locations(),
-        'selected_location': location
+        'breakers': get_all_breakers(),
+        'selected_location': location,
+        'selected_breaker': breaker,
+        'start_date' : start_date,
+        'end_date' : end_date,
+        'current_page_num': pagniation_data['page'],
+        'total_pages': pagniation_data['total_pages'],
     }
 
     return render(request, 'Breaker/index.html', context)
+
+
+
+def get_breaker_detail(request):
+    location = request.GET.get('location', None)
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    breaker_id = request.GET.get('breaker_id', None)
+
+    if breaker_id is None:
+        return JsonResponse({"error": "No breaker ID provided", "data": []}, status=400)
+
+    if start_date is None and end_date is None:
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
+    else:
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
+    df = query_data(location, start_date, end_date, breaker_id)
+    result = data_processing(df, only_parent_rows=False)
+    result["open_by_cmd"] = result["open_by_cmd"].fillna("0")
+    result["close_by_cmd"] = result["close_by_cmd"].fillna("0")
+    result["total_trips"] = result["total_trips"].fillna("0")
+
+    # Convert datetime to ISO format directly here
+    result['start_time'] = result['start_time'].apply(lambda x: x.isoformat() if pd.notnull(x) else None)
+    result['end_time'] = result['end_time'].apply(lambda x: x.isoformat() if pd.notnull(x) else None)
+
+    # Convert the DataFrame to a list of dicts
+    results = result.to_dict(orient='records')
+    print(results)
+
+    return JsonResponse({"data": results})
+
+
+def generate_pdf(request):
+    # Data to be passed to the template
+
+    data = [
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+        [1, 2, 3, 4, 5],
+
+    ]
+
+
+
+    df = dummy_data()
+    results = df.to_dict(orient='records')
+
+    print(results)
+
+    data_for_template = {
+        'total_records': 15,  # Assuming you want to list numbers from 1 to 100
+        'data': results
+    }
+
+    # Render the HTML template with data
+    html_string = render_to_string('Breaker/pdf_template.html', data_for_template)
+
+    # Create a WeasyPrint HTML object and then render to a PDF
+    html = HTML(string=html_string)
+    result = html.write_pdf()
+
+    # Create a response object and set the content_type to 'application/pdf'
+    response = HttpResponse(result, content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="report.pdf"'  # or inline; filename=report.pdf
+    response['Content-Disposition'] = 'inline; filename="report.pdf"'
+
+    return response

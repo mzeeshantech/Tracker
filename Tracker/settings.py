@@ -82,20 +82,33 @@ WSGI_APPLICATION = "Tracker.wsgi.application"
 #         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": 'Tracker',
-        "USER": 'postgres',
-        "PASSWORD": '1234',
-        "HOST": '127.0.0.1',
-        "PORT": '5432',
-        'OPTIONS': {
-            'options': '-c timezone=Asia/Karachi',
-        },
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.postgresql_psycopg2",
+#         "NAME": 'Tracker',
+#         "USER": 'postgres',
+#         "PASSWORD": '1234',
+#         "HOST": '127.0.0.1',
+#         "PORT": '5432',
+#         'OPTIONS': {
+#             'options': '-c timezone=Asia/Karachi',
+#         },
+#
+#     }
+# }
 
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'xe',  # SID of the Oracle Database, XE for Express Edition
+        'USER': 'system',
+        'PASSWORD': '12345',
+        'HOST': '127.0.0.1',  # Empty if local, or specify the IP if remote
+        'PORT': '9501',  # Oracle listener port if default not used
     }
 }
+
 
 
 
@@ -135,7 +148,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # Assuming your project's static files are located in a folder at the project's root
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

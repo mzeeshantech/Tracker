@@ -38,7 +38,7 @@ class Alarm(models.Model):
         blank=True
     )
     location = models.CharField(
-        # max_length=12,
+        max_length=12,
         null=True,
         blank=True
     )
