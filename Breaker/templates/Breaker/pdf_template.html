@@ -166,6 +166,7 @@
             <table>
                 <thead>
                 <tr>
+                    <th>Location</th>
                     <th>Breaker</th>
                     <th>Start Time</th>
                     <th>End Time</th>
@@ -180,12 +181,13 @@
                     {% if detail.operation == 'Summary' %}
                         <tr style="background-color: #317afe30;">
                             <td><strong>{{ detail.breaker_id }}</strong></td>
-                            <td colspan="5" style="text-align: right"><strong>Total Trips: {{ detail.total_trips }},
+                            <td colspan="6" style="text-align: right"><strong>Total Trips: {{ detail.total_trips }},
                                 Time: {{ detail.duration|default:"-" }}</strong></td>
                         </tr>
                     {% endif %}
                     {% if detail.operation == 'Trip' %}
                         <tr>
+                            <td>{{ detail.location }}</td>
                             <td>{{ detail.breaker_id }}</td>
                             <td>{{ detail.start_time|default:"-" }}</td>
                             <td>{{ detail.end_time|default:"-" }}</td>

@@ -104,21 +104,41 @@ $(document).ready(function() {
                     // Clear existing child rows that follow the container
                     container.nextAll('.child-row').remove();
 
+                    var rowHtml = null
                     response.data.forEach(function(item) {
-                        var rowHtml = `
-                            <tr id="detailsRow${item.breaker_id}" class="child-row">
-                                <td></td>
-                                <td>${item.breaker_id}</td>
-                                <td>${item.start_time || 'N/A'}</td>
-                                <td>${item.end_time || 'N/A'}</td>
-                                <td>${item.duration}</td>
-                                <td>${item.open_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
-                                <td>${item.close_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
-                            </tr>
-                        `;
+                        if (rowHtml == null) {
+                            rowHtml = `
+                                <tr id="detailsRow${item.breaker_id}" class="child-row">
+                                    <td></td>
+                                    <td>${item.location}</td>
+                                    <td>${item.breaker_id}</td>
+                                    <td>${item.start_time || 'N/A'}</td>
+                                    <td>${item.end_time || 'N/A'}</td>
+                                    <td>${item.duration}</td>
+                                    <td>${item.open_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
+                                    <td>${item.close_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
+                                </tr>
+                            `;
+                        } else {
+                            rowHtml = rowHtml.concat(' ', `
+                                <tr id="detailsRow${item.breaker_id}" class="child-row">
+                                    <td></td>
+                                    <td>${item.location}</td>
+                                    <td>${item.breaker_id}</td>
+                                    <td>${item.start_time || 'N/A'}</td>
+                                    <td>${item.end_time || 'N/A'}</td>
+                                    <td>${item.duration}</td>
+                                    <td>${item.open_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
+                                    <td>${item.close_by_cmd ? '<i class="bi bi-check text-success"></i>' : '<i class="bi bi-x text-danger"></i>'}</td>
+                                </tr>
+                            `)
+                        }
+
                         // Append new row directly after the container
-                        container.after(rowHtml);
+//                        container.after(rowHtml);
                     });
+                    container.after(rowHtml);
+
 
                     // Toggle icons for the collapse action
                     $(this).find('.toggle-icon').toggleClass('bi-plus-circle bi-minus-circle');
@@ -145,53 +165,6 @@ $(document).ready(function() {
         }
     });
 });
-
-//
-//function updatePaginationControls(currentPage, totalPages) {
-//    var pagination = $('#pagination-controls');
-//    pagination.empty();  // Clear existing
-//    // Add new controls
-//    for (let i = 1; i <= totalPages; i++) {
-//        var activeClass = i === currentPage ? 'active' : '';
-//        var pageItem = `<li class="page-item ${activeClass}"><a class="page-link" href="#" onclick="fetchPageData(${i});">${i}</a></li>`;
-//        pagination.append(pageItem);
-//    }
-//}
-//
-//function fetchPageData(page) {
-//    $.ajax({
-//        url: '/get_paginated_data/',
-//        data: { page: page },
-//        success: function(response) {
-//            // Update your table or display area with the new data
-//            updateTable(response.data);
-//            updatePaginationControls(page, response.total_pages);
-//        }
-//    });
-//}
-//
-//
-//
-//function updateTable(data) {
-//    var table = $('#your-table-body-id');
-//    table.empty();  // Clear existing data
-//    data.forEach(function(item) {
-//        var row = `<tr>
-//            <td>${item.column1}</td>
-//            <td>${item.column2}</td>
-//            // Add more columns as needed
-//        </tr>`;
-//        table.append(row);
-//    });
-//}
-//
-//
-//
-//
-//$(document).ready(function() {
-//    fetchPageData(1);  // Load first page on page load
-//});
-
 
 $(document).ready(function() {
     $('#pagination-controls a.next-btn').click(function(e) {

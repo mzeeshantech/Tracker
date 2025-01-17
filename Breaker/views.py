@@ -173,7 +173,7 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
     # Find durations between OPEN and CLOSED for each breaker
     for breaker_id, group in grouped:
         all_breaker_ids.append(breaker_id)
-        group = group.sort_values("ZX")
+        # group = group.sort_values("ZX")
         trips = []
         open_time = None
         open_by_cmd = False
@@ -182,19 +182,22 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
         for i, row in group.iterrows():
 
             if "OPEN" in row["TEXT"]:
-                if "OPEN BY" in row["TEXT"]:
-                    continue
                 if "CTRL ISSUED BY" in row["TEXT"]:
                     open_by_cmd = True
+                if "CTRL ISSUED BY" in row["TEXT"]:
+                    continue
 
                 open_time = row["ZX"]
             elif ("CLOSED" in row["TEXT"] or "CLOSE CTRL" in row["TEXT"]) and open_time is not None:
                 closed_time = row["ZX"]
-                if "CLOSED BY" in row["TEXT"]:
-                    continue
 
                 if "CTRL ISSUED BY" in row["TEXT"]:
                     close_by_cmd = True
+
+                if "CTRL ISSUED BY" in row["TEXT"]:
+                    continue
+
+
 
                 if isinstance(closed_time, str):
                     closed_time = datetime.strptime(closed_time, "%d/%m/%Y %H:%M:%S")  # Adjust the format as needed
@@ -210,7 +213,8 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
                     "duration": convert_minutes_to_dhms(duration),
                     "open_by_cmd": open_by_cmd,
                     "close_by_cmd": close_by_cmd,
-                    "operation": "Trip"
+                    "operation": "Trip",
+                    "location":row["LOCATION"]
                 })
                 open_time = None  # Reset after finding a pair
                 open_by_cmd = False
@@ -293,7 +297,8 @@ def query_data(location=None, from_date=None, end_date=None, breaker_id=None):
             SELECT
                 "A1"."TIME" as zx,
                 "A1"."MS" AS "MS",
-                "A1"."TEXT" AS "TEXT"
+                "A1"."TEXT" AS "TEXT",
+                "A1"."LOCATION" AS "LOCATION"
             FROM
                 "ALARM" "A1"
             WHERE
