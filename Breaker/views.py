@@ -214,7 +214,7 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
                     "open_by_cmd": open_by_cmd,
                     "close_by_cmd": close_by_cmd,
                     "operation": "Trip",
-                    "location":row["LOCATION"]
+                    "location": row["LOCATION"]
                 })
                 open_time = None  # Reset after finding a pair
                 open_by_cmd = False
