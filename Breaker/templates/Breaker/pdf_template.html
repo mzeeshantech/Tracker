@@ -6,80 +6,191 @@
     <style>
         @page {
             size: A4;
-            margin: 10mm 15mm 10mm 15mm; /* Change the top, right, bottom and left margin */
+            margin: 10mm 15mm 10mm 15mm;
         }
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             font-size: 12px;
         }
+
         .header,
         .footer {
-            position: fixed;
             width: 100%;
             text-align: center;
             font-size: 16px;
         }
-        .header {
-            top: 0;
-        }
+
         .footer {
+            position: fixed;
             bottom: 0;
+            width: 100%;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            font-size: 12px;
         }
+
+        .footer .page-number {
+            display: inline-block;
+        }
+
         .page-content {
-            page-break-after: always;
-            margin-top: 50px; /* Same as header height */
-            margin-bottom: 50px; /* Same as footer height */
+            margin-top: 50px;
+            margin-bottom: 50px;
             padding-top: 15px;
             padding-bottom: 15px;
         }
-        .page-content:last-child {
-            page-break-after: auto;
-        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 11px;
         }
-        table, th, td {
-            border: 1px solid black;
+
+        /* Make the first row of the table more prominent */
+        thead th {
+            background-color: #007bff; /* Change to a more prominent color */
+            color: #ffffff; /* White text for better contrast */
+            text-align: left;
+            padding: 12px;
+            border: 1px solid #ddd;
         }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        tbody td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
         th, td {
-            padding: 8px;
             text-align: left;
         }
+
+        .breaker-title {
+            font-weight: bold;
+            font-size: 14px;
+            color: #444;
+            margin: 20px 0 10px;
+        }
+
+        .breaker-container {
+            margin-bottom: 30px;
+        }
+
+        /* Hide header on pages after the first page */
+        .header {
+            display: block;
+        }
+
+        /* Hide header on all pages except the first */
+        .header.hidden {
+            display: none;
+        }
+
+        /* Page Numbering */
+        .footer {
+            position: running(footer);
+        }
+
+        .footer .page-number {
+            content: "Page " counter(page) " of " counter(pages);
+        }
+
+        /* Apply the header visibility rules for page 1 only */
+        body:first-of-type .header {
+            display: block;
+        }
+
+        body:not(:first-of-type) .header {
+            display: none;
+        }
+
+        /* Page Numbering with WeasyPrint */
+        .footer {
+            position: running(footer);
+        }
+
+        @page :left {
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+            }
+        }
+
+        @page :right {
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+            }
+        }
+
     </style>
 </head>
 <body>
-    <div class="header">
-        Header content
-    </div>
-    <div class="footer">
-        Footer content
-    </div>
-    <div class="page-content">
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status 222</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Generate rows -->
-                {% for d in data %}
-                    <tr>
-                        <td>{{ d.TEXT }}</td>
-                        <td>d.1</td>
-                        <td>d.2</td>
-                        <td>d.3</td>
-                    </tr>
-                {% endfor %}
 
-            </tbody>
-        </table>
+<!-- Header Content (Visible only on the first page) -->
+<div class="header">
+    Breakers Statistics
+    <br>
+    From: {{ from_date }} To: {{ to_date }}
+</div>
+
+<div class="page-content">
+    {% for breaker_id, breaker_data in data.items %}
+        <div class="breaker-container">
+            {#            <div class="breaker-title">Breaker ID: {{ breaker_id }}</div>#}
+            <table>
+                <thead>
+                <tr>
+                    <th>Breaker</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Duration</th>
+                    <th>Open by CMD</th>
+                    <th>Close by CMD</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for detail in breaker_data %}
+
+                    {% if detail.operation == 'Summary' %}
+                        <tr>
+                            <td><strong>{{ detail.breaker_id }}</strong></td>
+                            <td colspan="5" style="text-align: right"><strong>Total Trips: {{ detail.total_trips }},
+                                Time: {{ detail.duration|default:"-" }}</strong></td>
+                        </tr>
+                    {% endif %}
+                    {% if detail.operation == 'Trip' %}
+                        <tr>
+                            <td>{{ detail.breaker_id }}</td>
+                            <td>{{ detail.start_time|default:"-" }}</td>
+                            <td>{{ detail.end_time|default:"-" }}</td>
+                            <td>{{ detail.duration|default:"-" }}</td>
+                            <td>{{ detail.open_by_cmd|yesno:"Yes,No" }}</td>
+                            <td>{{ detail.close_by_cmd|yesno:"Yes,No" }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Footer Content (Visible on every page) -->
+<div class="footer">
+    <div class="page-number">
+        <!-- Page number will be handled by CSS -->
     </div>
+</div>
+
 </body>
 </html>

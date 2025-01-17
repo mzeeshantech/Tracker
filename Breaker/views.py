@@ -72,17 +72,67 @@ def dummy_data():
         ["26/09/2024 21:35:48", 414000000, "8780 132CB A603 [ W603 - T601 ] BREAKER OPEN By N97685"],
         ["26/09/2024 22:02:11", 0, "8780 132CB A603 [ W603 - T601 ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
         ["26/09/2024 22:02:12", 737000000, "8780 132CB A603 [ W603 - T601 ] BREAKER CLOSED By N97685"],
+        ["16/08/2024 22:04:15", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY S61426"],
+        ["16/08/2024 22:04:17", 929000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN By S61426"],
+        ["17/08/2024 01:07:55", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 01:07:57", 845000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED By N100497"],
+        ["17/08/2024 19:33:21", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 19:33:23", 920000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN By N97685"],
+        ["17/08/2024 23:31:43", 221000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:52:48", 248000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["18/08/2024 01:55:00", 637000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:58:37", 868000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["16/08/2024 22:04:15", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY S61426"],
+        ["16/08/2024 22:04:17", 929000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN By S61426"],
+        ["17/08/2024 01:07:55", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 01:07:57", 845000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED By N100497"],
+        ["17/08/2024 19:33:21", 0, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 19:33:23", 920000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN By N97685"],
+        ["17/08/2024 23:31:43", 221000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:52:48", 248000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["18/08/2024 01:55:00", 637000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:58:37", 868000000, "8780 132CB A604 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["16/08/2024 22:04:15", 0, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY S61426"],
+        ["16/08/2024 22:04:17", 929000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN By S61426"],
+        ["17/08/2024 01:07:55", 0, "8780 132CB A605 [ D-8780_8782_B ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 01:07:57", 845000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER CLOSED By N100497"],
+        ["17/08/2024 19:33:21", 0, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 19:33:23", 920000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN By N97685"],
+        ["17/08/2024 23:31:43", 221000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:52:48", 248000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["18/08/2024 01:55:00", 637000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:58:37", 868000000, "8780 132CB A605 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["16/08/2024 22:04:15", 0, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY S61426"],
+        ["16/08/2024 22:04:17", 929000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN By S61426"],
+        ["17/08/2024 01:07:55", 0, "8780 132CB A606 [ D-8780_8782_B ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 01:07:57", 845000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER CLOSED By N100497"],
+        ["17/08/2024 19:33:21", 0, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 19:33:23", 920000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN By N97685"],
+        ["17/08/2024 23:31:43", 221000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:52:48", 248000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["18/08/2024 01:55:00", 637000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:58:37", 868000000, "8780 132CB A606 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["16/08/2024 22:04:15", 0, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY S61426"],
+        ["16/08/2024 22:04:17", 929000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN By S61426"],
+        ["17/08/2024 01:07:55", 0, "8780 132CB A607 [ D-8780_8782_B ] BREAKER CLOSE CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 01:07:57", 845000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER CLOSED By N100497"],
+        ["17/08/2024 19:33:21", 0, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN CTRL ISSUED BY REMOTE ISC SITE"],
+        ["17/08/2024 19:33:23", 920000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN By N97685"],
+        ["17/08/2024 23:31:43", 221000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:52:48", 248000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN"],
+        ["18/08/2024 01:55:00", 637000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER CLOSED"],
+        ["18/08/2024 01:58:37", 868000000, "8780 132CB A607 [ D-8780_8782_B ] BREAKER OPEN"],
     ]
 
     # Column names
-    columns = ["ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')", "MS", "TEXT"]
+    columns = ["ZX", "MS", "TEXT"]
 
     # Create DataFrame
     df = pd.DataFrame(data, columns=columns)
 
     # Convert the time column to datetime
-    df["ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')"] = pd.to_datetime(
-        df["ETA_MASTER.HISTIME.FORMATTIME(TIME,'11','DD/MM/YYYYHH24:MI:SS')"]
+    df["ZX"] = pd.to_datetime(
+        df["ZX"]
     )
 
     return df
@@ -108,7 +158,7 @@ def get_paginated_data(request, df):
         'total_pages': total_pages
     })
 
-def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagination = False, request = None):
+def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagination = False, request = None, for_pdf = False):
     # Extract the breaker ID as the third word in the TEXT column
     df["Breaker_ID"] = df["TEXT"].str.split().str[2]
 
@@ -118,9 +168,11 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
 
     # Group by breaker ID
     grouped = df.groupby("Breaker_ID")
+    all_breaker_ids = []
 
     # Find durations between OPEN and CLOSED for each breaker
     for breaker_id, group in grouped:
+        all_breaker_ids.append(breaker_id)
         group = group.sort_values("ZX")
         trips = []
         open_time = None
@@ -172,29 +224,56 @@ def data_processing(df, only_parent_rows = True, only_child_rows = True, do_pagi
             "child_rows": trips
         })
 
-    # Flatten data for display
-    flat_data = []
-    for summary in breakers_summary:
-        if only_parent_rows:
-            flat_data.append({
-                "breaker_id": summary["breaker_id"],
-                "total_trips": summary["total_trips"],
-                "start_time": None,
-                "end_time": None,
-                "duration": summary["total_trips_time"],
-                "operation": "Summary"
-            })
-        if only_child_rows:
-            for trip in summary["child_rows"]:
+    if not for_pdf:
+        # Flatten data for display
+        flat_data = []
+        for summary in breakers_summary:
+            if only_parent_rows:
                 flat_data.append({
                     "breaker_id": summary["breaker_id"],
-                    "total_trips": None,
-                    **trip
+                    "total_trips": summary["total_trips"],
+                    "start_time": None,
+                    "end_time": None,
+                    "duration": summary["total_trips_time"],
+                    "operation": "Summary"
                 })
+            if only_child_rows:
+                for trip in summary["child_rows"]:
+                    flat_data.append({
+                        "breaker_id": summary["breaker_id"],
+                        "total_trips": None,
+                        **trip
+                    })
 
-    result_df = pd.DataFrame(flat_data)
-    # print(result_df)
-    return result_df
+        result_df = pd.DataFrame(flat_data)
+        # print(result_df)
+        return result_df
+    else:
+        # Flatten data for display
+        flat_data = []
+        breakers_dict = {}
+        for id in all_breaker_ids:
+            breakers_dict[id] = []
+        for summary in breakers_summary:
+            if only_parent_rows:
+                breakers_dict[summary["breaker_id"]].append({
+                    "breaker_id": summary["breaker_id"],
+                    "total_trips": summary["total_trips"],
+                    "start_time": None,
+                    "end_time": None,
+                    "duration": summary["total_trips_time"],
+                    "operation": "Summary"
+                })
+            if only_child_rows:
+                for trip in summary["child_rows"]:
+                    breakers_dict[summary["breaker_id"]].append({
+                        "breaker_id": summary["breaker_id"],
+                        "total_trips": None,
+                        **trip
+                    })
+
+        return breakers_dict
+
 
 
 def query_data(location=None, from_date=None, end_date=None, breaker_id=None):
@@ -284,7 +363,7 @@ def index(request):
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
 
-    df          = query_data(location, start_date, end_date,breaker_id=breaker)
+    df          = query_data(location, start_date, end_date, breaker_id=breaker)
     result      = data_processing(df, only_child_rows=False, do_pagination=True)
 
     pagniation_data      = get_paginated_data(request, result)
@@ -421,16 +500,17 @@ def generate_pdf(request):
 
     ]
 
-
-
+    # df = query_data(location, start_date, end_date, breaker_id=breaker)
     df = dummy_data()
-    results = df.to_dict(orient='records')
+    result = data_processing(df, only_parent_rows=True, only_child_rows=True, for_pdf=True)
+    # results = result.to_dict(orient='records')
 
-    print(results)
+    print(result)
+    # exit()
 
     data_for_template = {
         'total_records': 15,  # Assuming you want to list numbers from 1 to 100
-        'data': results
+        'data': result
     }
 
     # Render the HTML template with data
