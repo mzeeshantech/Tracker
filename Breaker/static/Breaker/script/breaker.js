@@ -217,4 +217,22 @@ $(document).ready(function() {
         $('#current_page').val(new_val);
         $('#locationForm').submit();
     });
+
+    document.getElementById('exportPdf').addEventListener('click', function() {
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
+        var location = document.getElementById('location').value;
+        var breaker = document.getElementById('breaker').value;
+
+        var queryParams = new URLSearchParams({
+            start_date: startDate,
+            end_date: endDate,
+            location: location,
+            breaker: breaker
+        });
+
+        // Open the URL with the query parameters in a new tab
+        var url = `/generate_pdf/?${queryParams.toString()}`;
+        window.open(url, '_blank');
+    });
 });

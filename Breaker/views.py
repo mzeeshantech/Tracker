@@ -140,7 +140,7 @@ def dummy_data():
 
 
 def get_paginated_data(request, df):
-    page_size = 2  # Number of items per page
+    page_size = 10  # Number of items per page
     page = int(request.GET.get('page', 1))  # Get the page number from request
     start = (page - 1) * page_size
     end = page * page_size
@@ -311,7 +311,7 @@ def query_data(location=None, from_date=None, end_date=None, breaker_id=None):
                 "A1"."TIME"
             """
 
-    print(f"query = {query}")
+    # print(f"query = {query}")
 
     # Execute the query
     with connection.cursor() as cursor:
@@ -425,104 +425,42 @@ def get_breaker_detail(request):
 
 
 def generate_pdf(request):
-    # Data to be passed to the template
+    # Retrieve parameters from GET request
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    location = request.GET.get('location')
+    breaker = request.GET.get('breaker')
 
-    data = [
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
+    print(request.GET)
 
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
+    # Convert date strings to datetime objects
+    if start_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+    if end_date:
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
+    # Assume a default range of the last year if not provided
+    if not start_date or not end_date:
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365)
 
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-        [1, 2, 3, 4, 5],
-
-    ]
-
-    # df = query_data(location, start_date, end_date, breaker_id=breaker)
-    df = dummy_data()
+    df = query_data(location=location, from_date=start_date, end_date=end_date, breaker_id=breaker)
     result = data_processing(df, only_parent_rows=True, only_child_rows=True, for_pdf=True)
-    # results = result.to_dict(orient='records')
-
-    print(result)
-    # exit()
 
     data_for_template = {
-        'total_records': 15,  # Assuming you want to list numbers from 1 to 100
-        'data': result
+        'total_records': len(df),
+        'data': result,
+        'start_date' : start_date,
+        'end_date' : end_date,
+        'location' : location,
+        'breaker' : breaker
     }
 
-    # Render the HTML template with data
     html_string = render_to_string('Breaker/pdf_template.html', data_for_template)
-
-    # Create a WeasyPrint HTML object and then render to a PDF
     html = HTML(string=html_string)
-    result = html.write_pdf()
+    pdf = html.write_pdf()
 
-    # Create a response object and set the content_type to 'application/pdf'
-    response = HttpResponse(result, content_type='application/pdf')
-    # response['Content-Disposition'] = 'filename="report.pdf"'  # or inline; filename=report.pdf
+    response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'inline; filename="report.pdf"'
 
     return response

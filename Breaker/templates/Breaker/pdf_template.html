@@ -29,7 +29,7 @@
             width: 100%;
             border-top: 1px solid #ddd;
             padding-top: 10px;
-            font-size: 12px;
+            font-size: 5px;
         }
 
         .footer .page-number {
@@ -37,7 +37,7 @@
         }
 
         .page-content {
-            margin-top: 50px;
+            margin-top: 20px;
             margin-bottom: 50px;
             padding-top: 15px;
             padding-bottom: 15px;
@@ -100,10 +100,16 @@
         /* Page Numbering */
         .footer {
             position: running(footer);
+            font-size: 5px;
         }
 
         .footer .page-number {
             content: "Page " counter(page) " of " counter(pages);
+        }
+        .filter-section {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 5px;
         }
 
         /* Apply the header visibility rules for page 1 only */
@@ -129,6 +135,8 @@
         @page :right {
             @bottom-right {
                 content: "Page " counter(page) " of " counter(pages);
+                font-size: 10px;
+                margin-right: 20px;
             }
         }
 
@@ -138,9 +146,17 @@
 
 <!-- Header Content (Visible only on the first page) -->
 <div class="header">
-    Breakers Statistics
-    <br>
-    From: {{ from_date }} To: {{ to_date }}
+    <h3>Breakers Statistics</h3>
+    <div class="filter-section">
+        <p><b>From: </b>{{ start_date }}</p>
+        <p><b>To: </b>{{ end_date }}</p>
+    </div>
+    <div class="filter-section">
+        <p><b>location: </b>{{ location }}</p>
+        <p><b>Breaker: </b>{{ breaker }}</p>
+    </div>
+
+<!--    From: {{ start_date }} To: {{ end_date }}-->
 </div>
 
 <div class="page-content">
@@ -162,7 +178,7 @@
                 {% for detail in breaker_data %}
 
                     {% if detail.operation == 'Summary' %}
-                        <tr>
+                        <tr style="background-color: #317afe30;">
                             <td><strong>{{ detail.breaker_id }}</strong></td>
                             <td colspan="5" style="text-align: right"><strong>Total Trips: {{ detail.total_trips }},
                                 Time: {{ detail.duration|default:"-" }}</strong></td>
@@ -187,7 +203,7 @@
 
 <!-- Footer Content (Visible on every page) -->
 <div class="footer">
-    <div class="page-number">
+    <div class="page-number" >
         <!-- Page number will be handled by CSS -->
     </div>
 </div>
